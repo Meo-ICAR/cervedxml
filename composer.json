@@ -17,7 +17,8 @@
         "socialiteproviders/instagram": "^5.1",
         "socialiteproviders/instagram-basic": "*",
         "socialiteproviders/linkedin": "*",
-        "socialiteproviders/microsoft": "^4.7"
+        "socialiteproviders/microsoft": "^4.7",
+        "spatie/laravel-medialibrary": "^11.17"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
