@@ -59,7 +59,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->brandLogo(asset('images/castingpro.png'))  // Percorso del tuo logo
+            ->brandLogo(asset('images/cerved.png'))  // Percorso del tuo logo
             //    ->brandLogoHeight('3rem')  // Altezza del logo
             ->favicon(asset('images/favicon.ico'))  // Opzionale: favicon personalizzata
             ->registration()
@@ -71,7 +71,7 @@ class AdminPanelProvider extends PanelProvider
             // --- INIZIO CONFIGURAZIONE RENDER HOOK ---
             ->renderHook(
                 'panels::auth.register.form.after',  // Specifica il "punto" dove apparirà
-                fn(): string => Blade::render('<div class="mt-4"><x-filament-socialite::buttons /></div>'),
+                fn (): string => Blade::render('<div class="mt-4"><x-filament-socialite::buttons /></div>'),
             )
             ->colors([
                 'primary' => Color::Amber,
