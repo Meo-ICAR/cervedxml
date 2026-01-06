@@ -4,13 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Report extends Model implements HasMedia
 {
-    use SoftDeletes, InteractsWithMedia;
+    use InteractsWithMedia, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -22,10 +22,12 @@ class Report extends Model implements HasMedia
         'piva',
         'is_racese',
         'annotation',
-        'idsoggetto',
+        'id_soggetto',
         'codice_score',
         'descrizione_score',
         'valore',
+        'categoria_codice',
+        'categoria_descrizione',
         'status',
         'user_id',
     ];
@@ -48,7 +50,7 @@ class Report extends Model implements HasMedia
      *
      * @var array<int, string>
      */
-    protected $appends = ['xml_files'];
+    protected $appends = [];
 
     /**
      * Get the user that owns the report.
@@ -67,15 +69,32 @@ class Report extends Model implements HasMedia
             ->addMediaCollection('xml_files')
             ->acceptsMimeTypes(['application/xml', 'text/xml'])
             ->singleFile();
+
+        $this
+            ->addMediaCollection('xml_completo')
+            ->acceptsMimeTypes(['application/xml', 'text/xml'])
+            ->singleFile();
     }
 
     /**
      * Get the XML files associated with the report.
      */
+    /*
     public function getXmlFilesAttribute()
     {
         return $this->getMedia('xml_files');
     }
+    */
+
+    /**
+     * Get the complete XML file associated with the report.
+     */
+    /*
+    public function getXmlCompletoAttribute()
+    {
+        return $this->getFirstMedia('xml_completo');
+    }
+    */
 
     /**
      * Add an XML file to the report.
@@ -86,5 +105,126 @@ class Report extends Model implements HasMedia
     public function addXmlFile($file)
     {
         return $this->addMedia($file)->toMediaCollection('xml_files');
+    }
+
+    /**
+     * Get the formatted (pretty-print) content of the complete XML.
+     *
+     * @return string|null
+     */
+    public function getFormattedXmlCompleto()
+    {
+        $media = $this->getFirstMedia('xml_completo');
+
+        if (! $media || ! file_exists($media->getPath())) {
+            return null;
+        }
+
+        $xmlContent = file_get_contents($media->getPath());
+
+        try {
+            $dom = new \DOMDocument('1.0');
+            $dom->preserveWhiteSpace = false;
+            $dom->formatOutput = true;
+            $dom->loadXML($xmlContent);
+
+            return $dom->saveXML();
+        } catch (\Exception $e) {
+            \Log::error('Errore durante la formattazione dell\'XML: '.$e->getMessage());
+
+            return $xmlContent;
+        }
+    }
+
+    /**
+     * Get the XML content as an HTML table structure.
+     *
+     * @return string|null
+     */
+    public function getXmlAsHtmlTable()
+    {
+        $media = $this->getFirstMedia('xml_completo');
+
+        if (! $media || ! file_exists($media->getPath())) {
+            return null;
+        }
+
+        $xmlContent = file_get_contents($media->getPath());
+
+        try {
+            $xml = new \SimpleXMLElement($xmlContent);
+            return $this->renderXmlElementAsTable($xml);
+        } catch (\Exception $e) {
+            \Log::error('Errore durante la conversione XML in Tabella: '.$e->getMessage());
+            return '<p>Errore nel caricamento dell\'anteprima.</p>';
+        }
+    }
+
+    /**
+     * Recursively render XML element as HTML table.
+     */
+    private function renderXmlElementAsTable($element)
+    {
+        $html = '<table class="xml-table" style="width:100%; border-collapse: collapse; border: 1px solid #ddd; margin-bottom: 5px; font-size: 0.9rem;">';
+        
+        // Attributes
+        foreach($element->attributes() as $a => $b) {
+             $html .= '<tr>';
+             $html .= '<td style="border: 1px solid #ddd; padding: 4px; background-color: #f2f2f2; font-weight: bold; font-style: italic; width: 25%;">@' . htmlspecialchars($a) . '</td>';
+             $html .= '<td style="border: 1px solid #ddd; padding: 4px;">' . htmlspecialchars((string)$b) . '</td>';
+             $html .= '</tr>';
+        }
+
+        foreach ($element->children() as $child) {
+            $name = $child->getName();
+            
+            $html .= '<tr>';
+            $html .= '<td style="border: 1px solid #ddd; padding: 4px; background-color: #f9f9f9; font-weight: bold; width: 25%;">' . htmlspecialchars($name) . '</td>';
+            
+            if ($child->count() > 0) {
+                $html .= '<td style="border: 1px solid #ddd; padding: 4px;">' . $this->renderXmlElementAsTable($child) . '</td>';
+            } else {
+                $html .= '<td style="border: 1px solid #ddd; padding: 4px;">' . htmlspecialchars((string)$child) . '</td>';
+            }
+            $html .= '</tr>';
+        }
+        
+        $html .= '</table>';
+        return $html;
+    }
+
+    /**
+     * Generate a complete XML file by adding valore and annotation to the existing XML.
+     *
+     * @return \Spatie\MediaLibrary\MediaCollections\Models\Media
+     */
+    public function generateCompleteXml()
+    {
+        $originalMedia = $this->getFirstMedia('xml_files');
+        
+        if (!$originalMedia) {
+            throw new \Exception('File XML originale non trovato.');
+        }
+
+        $xmlContent = file_get_contents($originalMedia->getPath());
+
+        try {
+            $xml = new \SimpleXMLElement($xmlContent);
+            
+            // Aggiunge i nuovi tag in coda (all'interno del nodo radice)
+            $xml->addChild('valore', htmlspecialchars((string) $this->valore));
+            $xml->addChild('annotation', htmlspecialchars((string) $this->annotation));
+            
+            $tempFile = tempnam(sys_get_temp_dir(), 'xml_completo');
+            $xml->asXML($tempFile);
+
+            return $this->addMedia($tempFile)
+                ->usingFileName('XML_completo.xml')
+                ->usingName('XML Completo')
+                ->toMediaCollection('xml_completo');
+        } catch (\Exception $e) {
+            \Log::error('Errore durante la generazione del file XML completo: ' . $e->getMessage());
+            throw $e;
+        }
     }
 }

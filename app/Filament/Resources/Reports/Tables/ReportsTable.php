@@ -18,32 +18,27 @@ class ReportsTable
     {
         return $table
             ->columns([
-                TextColumn::make('name')
-                    ->sortable()
-                    ->searchable(),
                 TextColumn::make('piva')
+                    ->label('P.IVA')
                     ->sortable()
                     ->searchable(),
-                IconColumn::make('is_racese')
-                    ->boolean(),
-                TextColumn::make('idsoggetto')
-                    ->searchable(),
-                TextColumn::make('codice_score')
-                    ->searchable(),
-                TextColumn::make('descrizione_score')
+                TextColumn::make('name')
+                    ->label('Denominazione')
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('valore')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('status')
-                    ->searchable(),
-                TextColumn::make('user_id')
-                    ->numeric()
-                    ->sortable(),
+                    ->label('ECOFIN')
+                    ->numeric(),
+
+                TextColumn::make('annotation')
+                    ->label('Note')
+                    ->limit(50),
+
                 TextColumn::make('updated_at')
+                    ->label('Aggiornato')
                     ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->sortable(),
+                //  ->toggleable(isToggledHiddenByDefault: true)
             ])
             ->filters([
                 TrashedFilter::make(),

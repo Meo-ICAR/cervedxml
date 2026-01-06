@@ -2,9 +2,12 @@
 
 namespace App\Filament\Resources\Reports\Schemas;
 
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
+use Filament\Schema\Components\Toggle;
+use Filament\Forms\Components\ViewField;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
 class ReportForm
@@ -13,26 +16,66 @@ class ReportForm
     {
         return $schema
             ->components([
-                TextInput::make('name')
-                    ->required(),
                 TextInput::make('piva')
-                    ->required(),
-                Toggle::make('is_racese')
-                    ->required(),
-                Textarea::make('annotation')
-                    ->columnSpanFull(),
-                TextInput::make('idsoggetto')
-                    ->required(),
-                TextInput::make('codice_score')
-                    ->required(),
-                TextInput::make('descrizione_score')
-                    ->required(),
-                TextInput::make('valore')
                     ->required()
+                    ->label('P.IVA')
+                    ->length(11),
+
+                TextInput::make('name')
+                    ->hidden(fn ($operation) => $operation === 'create')
+                    ->label('Denominazione')
+                    ->required(fn ($operation) => $operation !== 'create'),
+                SpatieMediaLibraryFileUpload::make('xml_files')
+                    ->collection('xml_files')
+                    ->label('File XML Originale')
+                    ->acceptedFileTypes(['application/xml', 'text/xml'])
+                    ->downloadable()
+                    ->openable()
+                    ->columnSpanFull(),
+
+                TextInput::make('valore')
+                    ->hidden(fn ($operation) => $operation === 'create')
+                    ->required(fn ($operation) => $operation !== 'create')
+                    ->label('ECOFIN Score')
                     ->numeric(),
                 TextInput::make('status')
-                    ->required()
+                    ->hidden(fn ($operation) => $operation === 'create')
+                    ->disabled()
+                    ->required(fn ($operation) => $operation !== 'create')
                     ->default('draft'),
+
+                Textarea::make('annotation')
+                    ->hidden(fn ($operation) => $operation === 'create')
+                    ->label('Note')
+                    ->columnSpanFull(),
+
+                /*
+
+                                SpatieMediaLibraryFileUpload::make('xml_completo')
+                                    ->collection('xml_completo')
+                                    ->label('File XML Completo')
+                                    ->acceptedFileTypes(['application/xml', 'text/xml'])
+                                    ->downloadable()
+                                    ->openable()
+                                    ->deletable(false)
+                                    ->dehydrated(false)
+                                    //  ->displayFileName()
+                                    ->columnSpanFull(),
+                */
+
+                Section::make('Anteprima XML Completo')
+                    ->collapsible()
+                    ->collapsed()
+                    ->schema([
+                        ViewField::make('xml_content_preview')
+                            ->view('filament.reports.xml-preview')
+                            ->formatStateUsing(fn ($record) => $record?->getXmlAsHtmlTable())
+                            ->columnSpanFull(),
+                    ])
+                    ->visible(fn ($record) => $record?->hasMedia('xml_completo'))
+                    ->columnSpanFull(),
+
+
             ]);
     }
 }

@@ -33,7 +33,7 @@ return [
         'client_id' => env('MICROSOFT_CLIENT_ID'),
         'client_secret' => env('MICROSOFT_CLIENT_SECRET'),
         'redirect' => env('MICROSOFT_REDIRECT_URI'),
-        'proxy' => env('PROXY')  // Optional, will be used for all requests
+        'proxy' => env('PROXY'),  // Optional, will be used for all requests
     ],
     'google' => [
         'client_id' => env('GOOGLE_CLIENT_ID'),

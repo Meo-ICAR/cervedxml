@@ -10,13 +10,11 @@ use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Pages\Dashboard;
-use Filament\Support\Colors\Color;
-use Filament\Support\Colors;
-use Filament\Widgets\AccountWidget;
-use Filament\Widgets\FilamentInfoWidget;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Illuminate\Contracts\Auth\Authenticatable;
+use Filament\Support\Colors\Color;
+use Filament\Widgets\AccountWidget;
+use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -27,7 +25,6 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;  // Già che ci sei, servirà anche questo per Str::random
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Laravel\Socialite\Contracts\User as SocialiteUserContract;
 // use SocialiteProviders\LinkedIn\LinkedInExtendSocialite;  // Fai attenzione alle maiuscole: LinkedIn
 use SocialiteProviders\Manager\SocialiteWasCalled;
 use SocialiteProviders\Microsoft\MicrosoftExtendSocialite;
@@ -125,7 +122,7 @@ class AdminPanelProvider extends PanelProvider
                         return User::create([
                             'name' => $oauthUser->getName(),
                             'email' => $oauthUser->getEmail(),
-                            'password' => null,  // Password nullable obbligatoria per Socialite
+                            //   'password' => null,  // Password nullable obbligatoria per Socialite
                             'avatar_url' => $oauthUser->getAvatar(),  // Salva l'URL di Google
                             'email_verified_at' => now(),  // Google certifica l'email, quindi la segniamo come verificata
                             'password' => Hash::make(Str::random(32)),  // Password casuale sicura

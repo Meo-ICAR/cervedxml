@@ -7,7 +7,6 @@ use App\Models\Report;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class ReportController extends Controller
@@ -33,14 +32,13 @@ class ReportController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data' => $reports
+            'data' => $reports,
         ]);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
@@ -50,7 +48,7 @@ class ReportController extends Controller
             'piva' => 'required|string|size:11',
             'is_racese' => 'sometimes|boolean',
             'annotation' => 'nullable|string',
-            'idsoggetto' => 'required|string|max:20',
+            'id_soggetto' => 'required|string|max:20',
             'codice_score' => 'required|string|max:20',
             'descrizione_score' => 'required|string|max:255',
             'valore' => 'required|numeric|between:0,99999999.99',
@@ -71,14 +69,15 @@ class ReportController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Report created successfully',
-                'data' => $report->load('media')
+                'data' => $report->load('media'),
             ], 201);
         } catch (\Exception $e) {
-            Log::error('Error creating report: ' . $e->getMessage());
+            Log::error('Error creating report: '.$e->getMessage());
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to create report',
-                'error' => config('app.debug') ? $e->getMessage() : null
+                'error' => config('app.debug') ? $e->getMessage() : null,
             ], 500);
         }
     }
@@ -86,7 +85,6 @@ class ReportController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Report  $report
      * @return \Illuminate\Http\JsonResponse
      */
     public function show(Report $report)
@@ -95,15 +93,13 @@ class ReportController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data' => $report->load('media')
+            'data' => $report->load('media'),
         ]);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Report  $report
      * @return \Illuminate\Http\JsonResponse
      */
     public function update(Request $request, Report $report)
@@ -115,7 +111,7 @@ class ReportController extends Controller
             'piva' => 'sometimes|string|size:11',
             'is_racese' => 'sometimes|boolean',
             'annotation' => 'nullable|string',
-            'idsoggetto' => 'sometimes|string|max:20',
+            'id_soggetto' => 'sometimes|string|max:20',
             'codice_score' => 'sometimes|string|max:20',
             'descrizione_score' => 'sometimes|string|max:255',
             'valore' => 'sometimes|numeric|between:0,99999999.99',
@@ -135,14 +131,15 @@ class ReportController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Report updated successfully',
-                'data' => $report->load('media')
+                'data' => $report->load('media'),
             ]);
         } catch (\Exception $e) {
-            Log::error('Error updating report: ' . $e->getMessage());
+            Log::error('Error updating report: '.$e->getMessage());
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to update report',
-                'error' => config('app.debug') ? $e->getMessage() : null
+                'error' => config('app.debug') ? $e->getMessage() : null,
             ], 500);
         }
     }
@@ -150,7 +147,6 @@ class ReportController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Report  $report
      * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Report $report)
@@ -166,14 +162,15 @@ class ReportController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Report deleted successfully'
+                'message' => 'Report deleted successfully',
             ]);
         } catch (\Exception $e) {
-            Log::error('Error deleting report: ' . $e->getMessage());
+            Log::error('Error deleting report: '.$e->getMessage());
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to delete report',
-                'error' => config('app.debug') ? $e->getMessage() : null
+                'error' => config('app.debug') ? $e->getMessage() : null,
             ], 500);
         }
     }
@@ -181,8 +178,6 @@ class ReportController extends Controller
     /**
      * Upload an XML file to an existing report.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Report  $report
      * @return \Illuminate\Http\JsonResponse
      */
     public function uploadXml(Request $request, Report $report)
@@ -206,14 +201,15 @@ class ReportController extends Controller
                     'file_name' => $media->file_name,
                     'mime_type' => $media->mime_type,
                     'size' => $media->size,
-                ]
+                ],
             ]);
         } catch (\Exception $e) {
-            Log::error('Error uploading XML file: ' . $e->getMessage());
+            Log::error('Error uploading XML file: '.$e->getMessage());
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to upload XML file',
-                'error' => config('app.debug') ? $e->getMessage() : null
+                'error' => config('app.debug') ? $e->getMessage() : null,
             ], 500);
         }
     }

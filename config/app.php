@@ -135,7 +135,7 @@ return [
             explode(',', (string) env('APP_PREVIOUS_KEYS', ''))
         ),
     ],
-
+    'GuzzleHttp\Client' => \GuzzleHttp\Client::class,
     /*
      * |--------------------------------------------------------------------------
      * | Maintenance Mode Driver

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\ExternalReportController;
 use App\Http\Controllers\API\ReportController;
 use Illuminate\Support\Facades\Route;
 
@@ -13,6 +14,8 @@ use Illuminate\Support\Facades\Route;
  * | be assigned to the "api" middleware group. Make something great!
  * |
  */
+
+Route::post('/cerved-report', [ExternalReportController::class, 'store']);
 
 Route::middleware('auth:api')->group(function () {
     // Report resource routes
