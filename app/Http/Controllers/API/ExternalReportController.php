@@ -77,7 +77,14 @@ class ExternalReportController extends Controller
             $report = Report::where('piva', $validated['piva'])->first();
 
             if (! $report) {
-                return response()->json(['status' => 'error', 'message' => 'Report not found'], 404);
+                //  $user = User::first();
+                $report = Report::create([
+                    'piva' => $validated['piva'],
+                    'name' => 'Pending Fetch...',
+
+                    'status' => 'pending',
+                    //   'user_id' => $user ? $user->id : 1,
+                ]);
             }
 
             $report->addXmlFile($request->file('file'));
