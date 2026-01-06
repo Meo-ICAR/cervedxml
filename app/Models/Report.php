@@ -166,29 +166,29 @@ class Report extends Model implements HasMedia
     private function renderXmlElementAsTable($element)
     {
         $html = '<table class="xml-table" style="width:100%; border-collapse: collapse; border: 1px solid #ddd; margin-bottom: 5px; font-size: 0.9rem;">';
-        
+
         // Attributes
-        foreach($element->attributes() as $a => $b) {
-             $html .= '<tr>';
-             $html .= '<td style="border: 1px solid #ddd; padding: 4px; background-color: #f2f2f2; font-weight: bold; font-style: italic; width: 25%;">@' . htmlspecialchars($a) . '</td>';
-             $html .= '<td style="border: 1px solid #ddd; padding: 4px;">' . htmlspecialchars((string)$b) . '</td>';
-             $html .= '</tr>';
+        foreach ($element->attributes() as $a => $b) {
+            $html .= '<tr>';
+            $html .= '<td style="border: 1px solid #ddd; padding: 4px; background-color: #f2f2f2; font-weight: bold; font-style: italic; width: 25%;">@'.htmlspecialchars($a).'</td>';
+            $html .= '<td style="border: 1px solid #ddd; padding: 4px;">'.htmlspecialchars((string) $b).'</td>';
+            $html .= '</tr>';
         }
 
         foreach ($element->children() as $child) {
             $name = $child->getName();
-            
+
             $html .= '<tr>';
-            $html .= '<td style="border: 1px solid #ddd; padding: 4px; background-color: #f9f9f9; font-weight: bold; width: 25%;">' . htmlspecialchars($name) . '</td>';
-            
+            $html .= '<td style="border: 1px solid #ddd; padding: 4px; background-color: #f9f9f9; font-weight: bold; width: 25%;">'.htmlspecialchars($name).'</td>';
+
             if ($child->count() > 0) {
-                $html .= '<td style="border: 1px solid #ddd; padding: 4px;">' . $this->renderXmlElementAsTable($child) . '</td>';
+                $html .= '<td style="border: 1px solid #ddd; padding: 4px;">'.$this->renderXmlElementAsTable($child).'</td>';
             } else {
-                $html .= '<td style="border: 1px solid #ddd; padding: 4px;">' . htmlspecialchars((string)$child) . '</td>';
+                $html .= '<td style="border: 1px solid #ddd; padding: 4px;">'.htmlspecialchars((string) $child).'</td>';
             }
             $html .= '</tr>';
         }
-        
+
         $html .= '</table>';
         return $html;
     }
@@ -201,29 +201,38 @@ class Report extends Model implements HasMedia
     public function generateCompleteXml()
     {
         $originalMedia = $this->getFirstMedia('xml_files');
-        
-        if (!$originalMedia) {
+
+        if (! $originalMedia) {
             throw new \Exception('File XML originale non trovato.');
         }
 
         $xmlContent = file_get_contents($originalMedia->getPath());
+        $this->status = 'Generated';
+        $this->save();
 
         try {
             $xml = new \SimpleXMLElement($xmlContent);
-            
+
             // Aggiunge i nuovi tag in coda (all'interno del nodo radice)
-            $xml->addChild('valore', htmlspecialchars((string) $this->valore));
-            $xml->addChild('annotation', htmlspecialchars((string) $this->annotation));
-            
+            $xml->addChild('ECOFIN-Giudizio', htmlspecialchars((string) $this->categoria_descrizione));
+            $xml->addChild('ECOFIN-Indice', htmlspecialchars((string) $this->valore));
+            $xml->addChild('Annotazioni', htmlspecialchars((string) $this->annotation));
+
             $tempFile = tempnam(sys_get_temp_dir(), 'xml_completo');
             $xml->asXML($tempFile);
 
-            return $this->addMedia($tempFile)
+            $this->clearMediaCollection('xml_completo');
+
+            $media = $this->addMedia($tempFile)
                 ->usingFileName('XML_completo.xml')
                 ->usingName('XML Completo')
                 ->toMediaCollection('xml_completo');
+
+
+
+            return $media;
         } catch (\Exception $e) {
-            \Log::error('Errore durante la generazione del file XML completo: ' . $e->getMessage());
+            \Log::error('Errore durante la generazione del file XML completo: '.$e->getMessage());
             throw $e;
         }
     }

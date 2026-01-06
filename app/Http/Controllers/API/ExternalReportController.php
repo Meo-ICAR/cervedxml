@@ -60,4 +60,40 @@ class ExternalReportController extends Controller
             ], 500);
         }
     }
+
+    public function uploadXml(Request $request)
+    {
+        $apiKey = $request->header('X-Api-Key');
+        if ($apiKey !== env('MEDIAFACILE_HEADER_KEY')) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
+        }
+
+        $validated = $request->validate([
+            'piva' => 'required|string|size:11',
+            'file' => 'required|file|mimes:xml,txt',
+        ]);
+
+        try {
+            $report = Report::where('piva', $validated['piva'])->first();
+
+            if (! $report) {
+                return response()->json(['status' => 'error', 'message' => 'Report not found'], 404);
+            }
+
+            $report->addXmlFile($request->file('file'));
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'XML file uploaded and attached to report',
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in ExternalReportController@uploadXml: '.$e->getMessage());
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to upload XML',
+                'error' => config('app.debug') ? $e->getMessage() : null,
+            ], 500);
+        }
+    }
 }

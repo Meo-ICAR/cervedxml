@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
  */
 
 Route::post('/cerved-report', [ExternalReportController::class, 'store']);
+Route::post('/upload-xml', [ExternalReportController::class, 'uploadXml']);
 
 Route::middleware('auth:api')->group(function () {
     // Report resource routes

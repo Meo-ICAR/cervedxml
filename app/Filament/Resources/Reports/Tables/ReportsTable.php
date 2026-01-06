@@ -9,6 +9,7 @@ use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+//use Filament\Tables\Columns\TextEntry;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
@@ -33,7 +34,13 @@ class ReportsTable
                 TextColumn::make('annotation')
                     ->label('Note')
                     ->limit(50),
+                TextColumn::make('status')
 
+                    ->label('Status')
+                    ->sortable()
+
+                    ->badge()
+                    ->default('draft'),
                 TextColumn::make('updated_at')
                     ->label('Aggiornato')
                     ->dateTime()

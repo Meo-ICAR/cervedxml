@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Reports\Schemas;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Schema\Components\Toggle;
 use Filament\Forms\Components\ViewField;
 use Filament\Schemas\Components\Section;
@@ -38,10 +39,17 @@ class ReportForm
                     ->required(fn ($operation) => $operation !== 'create')
                     ->label('ECOFIN Score')
                     ->numeric(),
-                TextInput::make('status')
+
+                TextInput::make('categoria_descrizione')
+                    ->hidden(fn ($operation) => $operation === 'create')
+                    ->required(fn ($operation) => $operation !== 'create')
+                    ->label('Classificazione ECOFIN'),
+
+                TextEntry::make('status')
                     ->hidden(fn ($operation) => $operation === 'create')
                     ->disabled()
-                    ->required(fn ($operation) => $operation !== 'create')
+
+                    ->badge()
                     ->default('draft'),
 
                 Textarea::make('annotation')

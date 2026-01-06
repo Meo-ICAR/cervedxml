@@ -34,6 +34,7 @@ class CreateReport extends CreateRecord
         $record = parent::handleRecordCreation($data);
 
         Artisan::call('cerved:fetch-score', ['piva' => $record->piva]);
+        Artisan::call('cerved:notify-mediafacile', ['piva' => $record->piva]);
 
         return $record;
     }
