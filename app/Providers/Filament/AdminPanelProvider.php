@@ -39,9 +39,7 @@ class AdminPanelProvider extends PanelProvider
         Event::listen(function (SocialiteWasCalled $event) {
             // Google
             $event->extendSocialite('google', \SocialiteProviders\Google\Provider::class);
-            // LinkedIn
-            $event->extendSocialite('linkedin', \SocialiteProviders\LinkedIn\Provider::class);
-            // Instagram
+
 
             /*
              * $event->extendSocialite('instagram_basic', \SocialiteProviders\InstagramBasic\Provider::class);
