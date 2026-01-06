@@ -55,6 +55,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
+            ->authGuard('web')
             ->brandLogo(asset('images/cerved.png'))  // Percorso del tuo logo
             //    ->brandLogoHeight('3rem')  // Altezza del logo
             ->favicon(asset('images/favicon.ico'))  // Opzionale: favicon personalizzata
@@ -95,10 +96,7 @@ class AdminPanelProvider extends PanelProvider
             ->plugins([
                 FilamentSocialitePlugin::make()
                     ->providers([
-                        Provider::make('instagram_basic')
-                            ->label('Instagram')
-                            ->icon('fab-instagram')
-                            ->color('success'),
+
                         Provider::make('google')
                             ->label('Google')
                             ->icon('fab-google')
