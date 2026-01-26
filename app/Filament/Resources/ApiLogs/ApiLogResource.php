@@ -2,19 +2,17 @@
 
 namespace App\Filament\Resources\ApiLogs;
 
-use App\Filament\Resources\ApiLogs\Pages\CreateApiLog;
-use App\Filament\Resources\ApiLogs\Pages\EditApiLog;
 use App\Filament\Resources\ApiLogs\Pages\ListApiLogs;
 use App\Filament\Resources\ApiLogs\Pages\ViewApiLog;
 use App\Filament\Resources\ApiLogs\Schemas\ApiLogForm;
 use App\Filament\Resources\ApiLogs\Schemas\ApiLogInfolist;
 use App\Filament\Resources\ApiLogs\Tables\ApiLogsTable;
 use App\Models\ApiLog;
-use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use BackedEnum;
 
 class ApiLogResource extends Resource
 {
@@ -50,9 +48,7 @@ class ApiLogResource extends Resource
     {
         return [
             'index' => ListApiLogs::route('/'),
-            'create' => CreateApiLog::route('/create'),
             'view' => ViewApiLog::route('/{record}'),
-            'edit' => EditApiLog::route('/{record}/edit'),
         ];
     }
 }

@@ -57,13 +57,15 @@ class ReportsTable
                 TrashedFilter::make(),
             ])
             ->recordActions([
-                Action::make('view_xml')
-                    ->label('XML')
-                    ->icon('heroicon-o-code-bracket')
-                    ->color('primary')
-                    ->visible(fn(Report $record): bool => !empty($record->name) && $record->hasMedia('xml_files'))
-                    ->url(fn(Report $record): string => route('filament.admin.resources.reports.view-xml', $record))
-                    ->openUrlInNewTab(),
+                /*
+                 * Action::make('view_xml')
+                 *     ->label('XML')
+                 *     ->icon('heroicon-o-code-bracket')
+                 *     ->color('primary')
+                 *     ->visible(fn(Report $record): bool => !empty($record->name) && $record->hasMedia('xml_files'))
+                 *     ->url(fn(Report $record): string => route('filament.admin.resources.reports.view-xml', $record))
+                 *     ->openUrlInNewTab(),
+                 */
                 EditAction::make(),
             ])
             ->toolbarActions([
