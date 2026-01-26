@@ -11,6 +11,7 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 //use Filament\Tables\Columns\TextEntry;
 use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Table;
 
 class ReportsTable
@@ -30,6 +31,12 @@ class ReportsTable
                 TextColumn::make('valore')
                     ->label('ECOFIN')
                     ->numeric(),
+                SpatieMediaLibraryImageColumn::make('media')
+                ->collection('xml_files')
+                ->label('Anteprima')
+                ->circular()
+                ->stacked() // Se hai più immagini
+                ->limit(3),
 
                 TextColumn::make('annotation')
                     ->label('Note')
