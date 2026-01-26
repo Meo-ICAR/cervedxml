@@ -102,12 +102,41 @@ class Report extends Model implements HasMedia
      */
     public function addXmlFile($file, $piva)
     {
-        $nomefile = $piva . '.xml';
-        return $this
-            ->addMedia($file)
-            ->usingFileName($nomefile)
-            ->usingName($nomefile)
-            ->toMediaCollection('xml_files');
+        try {
+            $nomefile = $piva . '.xml';
+
+            // Debug: verifica il file temporaneo
+            \Log::info('File temporaneo: ' . $file->getPathname());
+            \Log::info('File esiste: ' . (file_exists($file->getPathname()) ? 'Sì' : 'No'));
+            \Log::info('File dimensione: ' . $file->getSize());
+
+            // Verifica che la directory di destinazione esista
+            $destinationPath = storage_path('app/public/xml_files');
+            if (!is_dir($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
+            }
+
+            $media = $this
+                ->addMedia($file)
+                ->usingFileName($nomefile)
+                ->usingName($nomefile)
+                ->toMediaCollection('xml_files');
+
+            // Verifica che il file sia stato salvato
+            $savedPath = $media->getPath();
+            \Log::info('Percorso salvato: ' . $savedPath);
+            \Log::info('File salvato esiste: ' . (file_exists($savedPath) ? 'Sì' : 'No'));
+
+            if (!file_exists($savedPath)) {
+                throw new \Exception('File non salvato correttamente');
+            }
+
+            return $media;
+        } catch (\Exception $e) {
+            \Log::error('Errore in addXmlFile: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            throw $e;
+        }
     }
 
     /**
