@@ -32,8 +32,11 @@ class ReportForm
                     ->acceptedFileTypes(['application/xml', 'text/xml'])
                     ->downloadable()
                     ->openable()
-                    ->visible((fn($operation) => $operation !== 'create'))
-                    ->columnSpanFull(),
+                    ->visible(fn($operation) => $operation !== 'create')
+                    ->columnSpanFull()
+                    ->getUploadedFileNameForStorageUsing(function ($file, $record) {
+                        return $record->piva . '.xml';
+                    }),
                 TextInput::make('valore')
                     ->hidden(fn($operation) => $operation === 'create')
                     ->required(fn($operation) => $operation !== 'create')

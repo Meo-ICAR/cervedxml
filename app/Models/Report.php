@@ -102,10 +102,11 @@ class Report extends Model implements HasMedia
      */
     public function addXmlFile($file, $piva)
     {
+        $nomefile = $piva . '.xml';
         return $this
             ->addMedia($file)
-            ->usingFileName($piva . '.xml')
-            ->usingName($piva)
+            ->usingFileName($nomefile)
+            ->usingName($nomefile)
             ->toMediaCollection('xml_files');
     }
 
@@ -252,5 +253,24 @@ class Report extends Model implements HasMedia
     public function isCompiled(): bool
     {
         return $this->hasMedia('xml_completo');  // Corretto da "this->" a "$this->"
+    }
+
+    public function getXmlUrlAttribute()
+    {
+        if (!$this->hasMedia('xml_files')) {
+            return null;
+        }
+
+        return route('xml.download', $this->piva);
+    }
+
+    public function getXmlMediaUrlAttribute()
+    {
+        $media = $this->getFirstMedia('xml_files');
+        if (!$media) {
+            return null;
+        }
+
+        return route('media.download', [$media->id, $media->file_name]);
     }
 }
