@@ -88,11 +88,16 @@ class ExternalReportController extends Controller
                 ]);
             }
 
-            $report->addXmlFile($request->file('file'), $piva);
-
+            // Assicurati che questa chiamata sia corretta
+            $media = $report->addXmlFile($request->file('file'), $piva);
             return response()->json([
                 'status' => 'success',
-                'message' => 'XML file uploaded and attached to report',
+                'message' => 'XML file uploaded successfully',
+                'data' => [
+                    'report' => $report,
+                    'media' => $media,
+                    'file_name' => $media->file_name,
+                ],
             ]);
         } catch (\Exception $e) {
             Log::error('Error in ExternalReportController@uploadXml: ' . $e->getMessage());

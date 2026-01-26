@@ -100,9 +100,13 @@ class Report extends Model implements HasMedia
      * @param  \Illuminate\Http\UploadedFile  $file
      * @return \Spatie\MediaLibrary\MediaCollections\Models\Media
      */
-    public function addXmlFile($file, $pivas)
+    public function addXmlFile($file, $piva)
     {
-        return $this->addMedia($file)->usingFileName($pivas . '.xml')->usingName($pivas)->toMediaCollection('xml_files');
+        return $this
+            ->addMedia($file)
+            ->usingFileName($piva . '.xml')
+            ->usingName($piva)
+            ->toMediaCollection('xml_files');
     }
 
     /**
