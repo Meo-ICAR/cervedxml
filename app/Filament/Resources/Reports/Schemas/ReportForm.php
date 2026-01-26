@@ -20,15 +20,19 @@ class ReportForm
             ->components([
                 TextInput::make('piva')
                     ->required()
-                    ->label('P.IVA')
-                    ->length(11),
+                    ->label('Partita IVA azienda cliente')
+                    ->length(11)
+                    ->id('report-piva')
+                    ->name('piva'),
                 TextInput::make('name')
                     ->hidden(fn($operation) => $operation === 'create')
-                    ->label('Denominazione')
-                    ->required(fn($operation) => $operation !== 'create'),
+                    ->label('Denominazione azienda cliente')
+                    ->required(fn($operation) => $operation !== 'create')
+                    ->id('report-name')
+                    ->name('name'),
                 SpatieMediaLibraryFileUpload::make('xml_files')
                     ->collection('xml_files')
-                    ->label('File XML Originale')
+                    ->label('File XML da Cerved / Mediafacile')
                     ->acceptedFileTypes(['application/xml', 'text/xml'])
                     ->downloadable()
                     ->openable()
