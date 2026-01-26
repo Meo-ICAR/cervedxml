@@ -23,7 +23,7 @@ class ExternalReportController extends Controller
             // Find or create report
             $report = Report::where('piva', $piva)->first();
 
-            if (! $report) {
+            if (!$report) {
                 // If no report exists, create a basic one.
                 // We need a user_id since it's not nullable.
                 $user = User::first();
@@ -51,7 +51,7 @@ class ExternalReportController extends Controller
                 'data' => $report,
             ]);
         } catch (\Exception $e) {
-            Log::error('Error in ExternalReportController: '.$e->getMessage());
+            Log::error('Error in ExternalReportController: ' . $e->getMessage());
 
             return response()->json([
                 'status' => 'error',
@@ -74,27 +74,28 @@ class ExternalReportController extends Controller
         ]);
 
         try {
-            $report = Report::where('piva', $validated['piva'])->first();
+            $piva = $validated['piva'];
+            $report = Report::where('piva', $piva)->first();
 
-            if (! $report) {
+            if (!$report) {
                 //  $user = User::first();
-                $report = Report::create([
-                    'piva' => $validated['piva'],
-                    'name' => 'Pending Fetch...',
 
+                $report = Report::create([
+                    'piva' => $piva,
+                    'name' => 'Pending Fetch...',
                     'status' => 'pending',
                     //   'user_id' => $user ? $user->id : 1,
                 ]);
             }
 
-            $report->addXmlFile($request->file('file'));
+            $report->addXmlFile($request->file('file'), $piva);
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'XML file uploaded and attached to report',
             ]);
         } catch (\Exception $e) {
-            Log::error('Error in ExternalReportController@uploadXml: '.$e->getMessage());
+            Log::error('Error in ExternalReportController@uploadXml: ' . $e->getMessage());
 
             return response()->json([
                 'status' => 'error',

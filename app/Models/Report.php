@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Report extends Model implements HasMedia
 {
@@ -76,25 +76,23 @@ class Report extends Model implements HasMedia
             ->singleFile();
     }
 
-    /**
-     * Get the XML files associated with the report.
-     */
-    /*
-    public function getXmlFilesAttribute()
-    {
-        return $this->getMedia('xml_files');
-    }
-    */
+    /** Get the XML files associated with the report. */
 
-    /**
-     * Get the complete XML file associated with the report.
-     */
     /*
-    public function getXmlCompletoAttribute()
-    {
-        return $this->getFirstMedia('xml_completo');
-    }
-    */
+     * public function getXmlFilesAttribute()
+     * {
+     *     return $this->getMedia('xml_files');
+     * }
+     */
+
+    /** Get the complete XML file associated with the report. */
+
+    /*
+     * public function getXmlCompletoAttribute()
+     * {
+     *     return $this->getFirstMedia('xml_completo');
+     * }
+     */
 
     /**
      * Add an XML file to the report.
@@ -102,9 +100,9 @@ class Report extends Model implements HasMedia
      * @param  \Illuminate\Http\UploadedFile  $file
      * @return \Spatie\MediaLibrary\MediaCollections\Models\Media
      */
-    public function addXmlFile($file)
+    public function addXmlFile($file, $pivas)
     {
-        return $this->addMedia($file)->toMediaCollection('xml_files');
+        return $this->addMedia($file)->usingFileName($pivas . '.xml')->usingName($pivas)->toMediaCollection('xml_files');
     }
 
     /**
@@ -116,7 +114,7 @@ class Report extends Model implements HasMedia
     {
         $media = $this->getFirstMedia('xml_completo');
 
-        if (! $media || ! file_exists($media->getPath())) {
+        if (!$media || !file_exists($media->getPath())) {
             return null;
         }
 
@@ -130,7 +128,7 @@ class Report extends Model implements HasMedia
 
             return $dom->saveXML();
         } catch (\Exception $e) {
-            \Log::error('Errore durante la formattazione dell\'XML: '.$e->getMessage());
+            \Log::error("Errore durante la formattazione dell'XML: " . $e->getMessage());
 
             return $xmlContent;
         }
@@ -145,7 +143,7 @@ class Report extends Model implements HasMedia
     {
         $media = $this->getFirstMedia('xml_completo');
 
-        if (! $media || ! file_exists($media->getPath())) {
+        if (!$media || !file_exists($media->getPath())) {
             return null;
         }
 
@@ -155,8 +153,8 @@ class Report extends Model implements HasMedia
             $xml = new \SimpleXMLElement($xmlContent);
             return $this->renderXmlElementAsTable($xml);
         } catch (\Exception $e) {
-            \Log::error('Errore durante la conversione XML in Tabella: '.$e->getMessage());
-            return '<p>Errore nel caricamento dell\'anteprima.</p>';
+            \Log::error('Errore durante la conversione XML in Tabella: ' . $e->getMessage());
+            return "<p>Errore nel caricamento dell'anteprima.</p>";
         }
     }
 
@@ -170,8 +168,8 @@ class Report extends Model implements HasMedia
         // Attributes
         foreach ($element->attributes() as $a => $b) {
             $html .= '<tr>';
-            $html .= '<td style="border: 1px solid #ddd; padding: 4px; background-color: #f2f2f2; font-weight: bold; font-style: italic; width: 25%;">@'.htmlspecialchars($a).'</td>';
-            $html .= '<td style="border: 1px solid #ddd; padding: 4px;">'.htmlspecialchars((string) $b).'</td>';
+            $html .= '<td style="border: 1px solid #ddd; padding: 4px; background-color: #f2f2f2; font-weight: bold; font-style: italic; width: 25%;">@' . htmlspecialchars($a) . '</td>';
+            $html .= '<td style="border: 1px solid #ddd; padding: 4px;">' . htmlspecialchars((string) $b) . '</td>';
             $html .= '</tr>';
         }
 
@@ -179,12 +177,12 @@ class Report extends Model implements HasMedia
             $name = $child->getName();
 
             $html .= '<tr>';
-            $html .= '<td style="border: 1px solid #ddd; padding: 4px; background-color: #f9f9f9; font-weight: bold; width: 25%;">'.htmlspecialchars($name).'</td>';
+            $html .= '<td style="border: 1px solid #ddd; padding: 4px; background-color: #f9f9f9; font-weight: bold; width: 25%;">' . htmlspecialchars($name) . '</td>';
 
             if ($child->count() > 0) {
-                $html .= '<td style="border: 1px solid #ddd; padding: 4px;">'.$this->renderXmlElementAsTable($child).'</td>';
+                $html .= '<td style="border: 1px solid #ddd; padding: 4px;">' . $this->renderXmlElementAsTable($child) . '</td>';
             } else {
-                $html .= '<td style="border: 1px solid #ddd; padding: 4px;">'.htmlspecialchars((string) $child).'</td>';
+                $html .= '<td style="border: 1px solid #ddd; padding: 4px;">' . htmlspecialchars((string) $child) . '</td>';
             }
             $html .= '</tr>';
         }
@@ -202,7 +200,7 @@ class Report extends Model implements HasMedia
     {
         $originalMedia = $this->getFirstMedia('xml_files');
 
-        if (! $originalMedia) {
+        if (!$originalMedia) {
             throw new \Exception('File XML originale non trovato.');
         }
 
@@ -223,17 +221,32 @@ class Report extends Model implements HasMedia
 
             $this->clearMediaCollection('xml_completo');
 
-            $media = $this->addMedia($tempFile)
+            $media = $this
+                ->addMedia($tempFile)
                 ->usingFileName('XML_completo.xml')
                 ->usingName('XML Completo')
                 ->toMediaCollection('xml_completo');
 
-
-
             return $media;
         } catch (\Exception $e) {
-            \Log::error('Errore durante la generazione del file XML completo: '.$e->getMessage());
+            \Log::error('Errore durante la generazione del file XML completo: ' . $e->getMessage());
             throw $e;
         }
+    }
+
+    /**
+     * Determina se il report è completo
+     */
+    public function isComplete(): bool
+    {
+        return !empty($this->name) && $this->hasMedia('xml_files');
+    }
+
+    /**
+     * Determina se il report è compilato (ha XML completo)
+     */
+    public function isCompiled(): bool
+    {
+        return $this->hasMedia('xml_completo');  // Corretto da "this->" a "$this->"
     }
 }

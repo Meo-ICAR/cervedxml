@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Reports\Tables;
 
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -9,9 +10,9 @@ use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-//use Filament\Tables\Columns\TextEntry;
-use Filament\Tables\Filters\TrashedFilter;
+// use Filament\Tables\Columns\TextEntry;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
 class ReportsTable
@@ -31,21 +32,18 @@ class ReportsTable
                 TextColumn::make('valore')
                     ->label('ECOFIN')
                     ->numeric(),
-                SpatieMediaLibraryImageColumn::make('media')
-                ->collection('xml_files')
-                ->label('Anteprima')
-                ->circular()
-                ->stacked() // Se hai più immagini
-                ->limit(3),
-
+                IconColumn::make('has_xml')
+                    ->label('XML')
+                    ->boolean()
+                    ->getStateUsing(fn(Report $record): bool => $record->hasMedia('xml_files'))
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle'),
                 TextColumn::make('annotation')
                     ->label('Note')
                     ->limit(50),
                 TextColumn::make('status')
-
                     ->label('Status')
                     ->sortable()
-
                     ->badge()
                     ->default('draft'),
                 TextColumn::make('updated_at')
@@ -58,6 +56,13 @@ class ReportsTable
                 TrashedFilter::make(),
             ])
             ->recordActions([
+                Action::make('view_xml')
+                    ->label('XML')
+                    ->icon('heroicon-o-code-bracket')
+                    ->color('primary')
+                    ->visible(fn(Report $record): bool => !empty($record->name) && $record->hasMedia('xml_files'))
+                    ->url(fn(Report $record): string => route('filament.admin.resources.reports.view-xml', $record))
+                    ->openUrlInNewTab(),
                 EditAction::make(),
             ])
             ->toolbarActions([
