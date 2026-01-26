@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Reports\Tables;
 
+use App\Models\Report;  // Assicurati di importare il modello corretto
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -35,7 +36,7 @@ class ReportsTable
                 IconColumn::make('has_xml')
                     ->label('XML')
                     ->boolean()
-                    ->getStateUsing(fn(Report $record): bool => $record->hasMedia('xml_files'))
+                    ->getStateUsing(fn(Report $record): bool => $record->hasMedia('xml_files'))  // Corretto qui
                     ->trueIcon('heroicon-o-check-circle')
                     ->falseIcon('heroicon-o-x-circle'),
                 TextColumn::make('annotation')
