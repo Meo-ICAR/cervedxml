@@ -13,9 +13,9 @@ return new class extends Migration
 {
     Schema::create('api_logs', function (Blueprint $table) {
         $table->id();
-        $table->string('direction'); // 'IN' (Incoming) o 'OUT' (Outgoing)
-        $table->string('method');    // GET, POST, etc.
-        $table->string('url');
+        $table->string('direction')->nullable(); // 'IN' (Incoming) o 'OUT' (Outgoing)
+        $table->string('method')->nullable();    // GET, POST, etc.
+        $table->string('url')->nullable();
         $table->integer('status_code')->nullable();
         $table->json('payload')->nullable();
         $table->json('response')->nullable();

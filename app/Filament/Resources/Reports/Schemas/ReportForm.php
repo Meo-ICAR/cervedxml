@@ -32,6 +32,7 @@ class ReportForm
                     ->acceptedFileTypes(['application/xml', 'text/xml'])
                     ->downloadable()
                     ->openable()
+                    ->visible(fn ($record) => !$record?->hasMedia('xml_files'))
                     ->columnSpanFull(),
 
                 TextInput::make('valore')
@@ -57,8 +58,7 @@ class ReportForm
                     ->label('Note')
                     ->columnSpanFull(),
 
-                /*
-
+          
                                 SpatieMediaLibraryFileUpload::make('xml_completo')
                                     ->collection('xml_completo')
                                     ->label('File XML Completo')
@@ -69,7 +69,7 @@ class ReportForm
                                     ->dehydrated(false)
                                     //  ->displayFileName()
                                     ->columnSpanFull(),
-                */
+             
 
                 Section::make('Anteprima XML Completo')
                     ->collapsible()
