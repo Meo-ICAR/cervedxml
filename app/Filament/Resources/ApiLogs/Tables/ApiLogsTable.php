@@ -4,7 +4,6 @@ namespace App\Filament\Resources\ApiLogs\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Infolists\Components\JsonEntry;  // Se disponibile o usa Code block
 use Filament\Infolists\Components\KeyValueEntry;

@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\ApiLogs\Pages;
 
 use App\Filament\Resources\ApiLogs\ApiLogResource;
-use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
 class ListApiLogs extends ListRecords
@@ -13,7 +12,7 @@ class ListApiLogs extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            //  CreateAction::make(),
         ];
     }
 }
