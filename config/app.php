@@ -59,7 +59,7 @@ return [
      * | is set to "UTC" by default as it is suitable for most use cases.
      * |
      */
-    'timezone' => 'UTC',
+    'timezone' => 'Europe/Rome',
 
     /*
      * |--------------------------------------------------------------------------
@@ -129,7 +129,6 @@ return [
         App\Providers\AuthServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-
     ],
     'previous_keys' => [
         ...array_filter(
@@ -137,6 +136,7 @@ return [
         ),
     ],
     'GuzzleHttp\Client' => \GuzzleHttp\Client::class,
+
     /*
      * |--------------------------------------------------------------------------
      * | Maintenance Mode Driver
