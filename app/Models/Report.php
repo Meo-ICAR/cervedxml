@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use App\Services\CervedXmlParser;
 
 class Report extends Model implements HasMedia
 {
@@ -262,6 +263,28 @@ class Report extends Model implements HasMedia
                 ->toMediaCollection('xml_completo');
 
             return $media;
+        } catch (\Exception $e) {
+            \Log::error('Errore durante la generazione del file XML completo: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+    
+    public function parseCervedXml()
+    {
+        $originalMedia = $this->getFirstMedia('xml_files');
+
+        if (!$originalMedia) {
+            throw new \Exception('File XML originale non trovato.');
+        }
+
+        $xmlContent = file_get_contents($originalMedia->getPath());
+        $this->status = 'Generated';
+        $this->save();
+
+        try {
+            $xml = new \SimpleXMLElement($xmlContent);
+            $parsed = CervedXmlParser::parseCervedXml($xmlContent);
+            return $parsed;
         } catch (\Exception $e) {
             \Log::error('Errore durante la generazione del file XML completo: ' . $e->getMessage());
             throw $e;
