@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
+use App\Services\CervedXmlParser;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
-use App\Services\CervedXmlParser;
 
 class Report extends Model implements HasMedia
 {
@@ -75,6 +75,18 @@ class Report extends Model implements HasMedia
             ->addMediaCollection('xml_completo')
             ->acceptsMimeTypes(['application/xml', 'text/xml'])
             ->singleFile();
+
+        $this
+            ->addMediaCollection('reports')
+            ->acceptsMimeTypes(['application/pdf'])
+            ->singleFile();
+
+        $this
+            ->addMediaCollection('parsed_data')
+            ->acceptsMimeTypes(['application/json'])
+            ->singleFile();
+
+
     }
 
     /** Get the XML files associated with the report. */
@@ -268,16 +280,22 @@ class Report extends Model implements HasMedia
             throw $e;
         }
     }
-    
+
     public function parseCervedXml()
     {
-        $originalMedia = $this->getFirstMedia('xml_files');
+        // Try to use the COMPLETE XML first (if generated)
+        $media = $this->getFirstMedia('xml_completo');
 
-        if (!$originalMedia) {
-            throw new \Exception('File XML originale non trovato.');
+        if (!$media) {
+            // Fallback to original
+            $media = $this->getFirstMedia('xml_files');
         }
 
-        $xmlContent = file_get_contents($originalMedia->getPath());
+        if (!$media) {
+            throw new \Exception('File XML non trovato (né completo né originale).');
+        }
+
+        $xmlContent = file_get_contents($media->getPath());
         $this->status = 'Generated';
         $this->save();
 

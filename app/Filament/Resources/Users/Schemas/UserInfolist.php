@@ -23,8 +23,6 @@ class UserInfolist
                 TextEntry::make('updated_at')
                     ->dateTime()
                     ->placeholder('-'),
-                TextEntry::make('avatar_url')
-                    ->placeholder('-'),
             ]);
     }
 }
